@@ -1,23 +1,24 @@
-import { Order } from "@/app/(app)/(tabs)";
+import { getInvoiceById } from "@/api/invoiceApi";
+import { Invoice } from "@/types/invoice";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import React, { useCallback } from "react";
+import { useLocalSearchParams } from "expo-router";
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 
-export default function ItemOrder({
-  orderId,
-  orderDate,
-  total,
-  status,
-  handlePress,
-}: Order) {
+interface props {
+  order: Invoice;
+  handlePress?: () => void;
+}
+
+export default function ItemOrder({ order, handlePress }: props) {
+  const { id, creationDate, totalPrice, status } = order;
   const getStatusIcon = () => {
     switch (status) {
-      case "delivered":
+      case "Delivering":
         return <Ionicons name="checkmark-done" size={24} color="green" />;
-      case "processing":
+      case "Canceled":
         return <Ionicons name="time" size={24} color="orange" />;
-      case "cancelled":
+      case "Delivered":
         return <Ionicons name="close-circle" size={24} color="red" />;
     }
   };
@@ -31,9 +32,9 @@ export default function ItemOrder({
         <Text className="ml-2 text-sm capitalize">{status}</Text>
       </View>
       <View className="p-2">
-        <InforLine label="Order ID:" value={orderId} />
-        <InforLine label="Order Date:" value={orderDate} />
-        <InforLine label="Total:" value={total} />
+        <InforLine label="Order ID:" value={id} />
+        <InforLine label="Order Date:" value={creationDate} />
+        <InforLine label="Total:" value={totalPrice} />
       </View>
     </TouchableOpacity>
   );

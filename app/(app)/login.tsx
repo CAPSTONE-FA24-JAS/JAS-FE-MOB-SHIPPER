@@ -9,7 +9,7 @@ import {
 import { AppDispatch } from "@/redux/store";
 import { Feather } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Image,
   ScrollView,
@@ -124,18 +124,6 @@ const Login = () => {
                 </Text>
               </TouchableOpacity>
               <Text className="text-lg text-gray-500">Forgot Password ?</Text>
-            </View>
-            <View className="flex-row items-center justify-center mx-10 mt-20">
-              <Text className="text-lg text-gray-500">
-                Don’t have an account?
-              </Text>
-              {/* <Link href="/auths/register" asChild>
-                  <TouchableOpacity>
-                    <Text className="text-[#4765F9] text-lg font-semibold mx-4">
-                      Sign up
-                    </Text>
-                  </TouchableOpacity>
-                </Link> */}
             </View>
           </View>
         </View>
