@@ -1,49 +1,76 @@
 export interface Invoice {
+  winnerId: number;
+  winnerName: string;
+  winnerPhone: string;
+  winnerEmail: string;
+  lotNumber: any;
+  lotId: number;
+  productId: number;
+  productName: string;
+  tax: any;
+  note: any;
+  addressToShip: any;
+  statusInvoiceDTOs: StatusInvoiceDto[];
   id: number;
-  status: "Delivering" | "Delivered" | "Canceled";
+  status: string;
   totalPrice: number;
-  paymentMethodId?: number;
-  addressToShipId?: number;
-  shipperId: number; // Corrected the shipperId type to number
-  myBidDTO: MyBidDTO;
+  linkBillTransaction: string;
+  paymentMethodId: any;
+  addressToShipId: any;
+  shipperId: number;
   creationDate: string;
-  statusInvoiceDTOs: statusInvoiceDTOs[];
+  myBidDTO: MyBidDTO;
+}
+
+export interface StatusInvoiceDto {
+  id: number;
+  status: string;
+  imageLink: string;
+  currentDate: string;
+  invoiceId: number;
 }
 
 export interface MyBidDTO {
-  id: number; // Corrected static values to number types
+  id: number;
   status: string;
   isDeposit: boolean;
-  autoBidPrice: number | null;
-  priceLimit: number | null;
-  isWinner: boolean | null;
-  isRefunded: boolean | null;
-  isInvoiced: boolean | null;
+  autoBidPrice: any;
+  priceLimit: any;
+  isWinner: boolean;
+  isRefunded: any;
+  isInvoiced: any;
+  yourMaxBidPrice: any;
   lotId: number;
-  yourMaxBidPrice: number | null;
   lotDTO: LotDTO;
+  historyCustomerLots: HistoryCustomerLot[];
+}
+
+export interface HistoryCustomerLot {
+  currentTime: string;
+  status: string;
+  customerLotId: number;
 }
 
 export interface LotDTO {
   id: number;
   title: string;
-  startPrice: number;
-  minPrice: number | null;
-  currentPrice: number | null;
-  finalPriceSold: number | null;
+  startPrice: any;
+  minPrice: any;
+  currentPrice: number;
+  finalPriceSold: any;
   status: string;
-  bidIncrement: number | null;
+  bidIncrement: any;
   deposit: number;
   buyNowPrice: number;
   floorFeePercent: number;
-  startTime: string; // Kept date as string for simplicity
+  startTime: string;
   endTime: string;
-  actualEndTime: string | null;
+  actualEndTime: any;
   isExtend: boolean;
   haveFinancialProof: boolean;
   lotType: string;
   imageLinkJewelry: string;
-  sellerId: number | null;
+  sellerId: any;
   staffId: number;
   jewelryId: number;
   auctionId: number;

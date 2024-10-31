@@ -11,6 +11,38 @@ interface formData {
   imageLink: Blob;
 }
 
+// Get orders Delivering for shipper
+export const getInvoicesReceivedByShipper = async (shipperId: number) => {
+  try {
+    console.log("Fetching invoices received by shipper...", shipperId);
+    const response = await apiClient.get<Response<dataResponse<Invoice>>>(
+      `${API_URL}/api/Invoices/GetInvoicesRecivedByShipper?shipperId=${shipperId}`
+    );
+
+    const { data } = response.data;
+    console.log("Invoices data:", data);
+
+    if (response.data.code === 404 || !data) {
+      console.log("No invoices found");
+      return { dataResponse: [] }; // Return empty array if no data
+    }
+
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error("Axios error:", error.toJSON());
+      throw new Error(
+        error.response?.data?.message ||
+          "Failed to fetch invoices received by shipper"
+      );
+    } else {
+      console.error("Error fetching invoices received by shipper:", error);
+      throw error;
+    }
+  }
+};
+
+// Get orders for shipper by status: Order New (5), Delivered (6), Cancelled (10)
 export const getInvoiceForShipper = async (
   shipperId: number,
   status: number
@@ -28,6 +60,12 @@ export const getInvoiceForShipper = async (
 
     console.log("====================================");
 
+    if (response.data.code === 404 || !response.data.data) {
+      // Handle the case where no data is found
+      console.log("No orders found");
+      return { dataResponse: [] }; // Return an empty array to indicate no orders
+    }
+
     const { data } = response.data;
     console.log("====================================");
     console.log("dataNe", JSON.stringify(data));
@@ -38,13 +76,15 @@ export const getInvoiceForShipper = async (
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error("Axios error:", error.toJSON());
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch invoices for shipper"
+      );
     } else {
       console.error("Error getting invoice for shipper:", error);
+      throw error;
     }
-    throw error;
   }
 };
-
 export const getInvoiceById = async (id: string) => {
   try {
     console.log("Getting invoice by id...", id);

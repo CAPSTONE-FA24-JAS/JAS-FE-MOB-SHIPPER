@@ -8,11 +8,15 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: true,
-      }}>
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          // Hide the default header for the Home screen
+          headerShown: false,
+          // Remove the title since the header is hidden
+          // title: "Home", // Optional: You can remove this line
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               name={focused ? "home" : "home-outline"}
@@ -22,7 +26,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="screen2"
+        name="profile"
         options={{
           title: "Profile",
           tabBarIcon: ({ color, focused }) => (

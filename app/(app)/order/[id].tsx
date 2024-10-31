@@ -23,7 +23,7 @@ import {
 import { Invoice } from "@/types/invoice";
 
 export default function OrderDetail() {
-  const { id } = useLocalSearchParams();
+  const { id, imageOrder, numStatus } = useLocalSearchParams();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [currentImageType, setCurrentImageType] = useState<
@@ -35,6 +35,8 @@ export default function OrderDetail() {
   >(null);
   const [pickupImage, setPickupImage] = useState<string>("");
   const [deliveryImage, setDeliveryImage] = useState<string>("");
+
+  console.log("orderDataID", JSON.stringify(orderData));
 
   // Check if order is picked up (status is "delivering")
   const isPickup =
@@ -117,6 +119,36 @@ export default function OrderDetail() {
       );
     }
   };
+
+  const getStatusIcon = () => {
+    switch (numStatus) {
+      case "Delivering":
+        return <Ionicons name="checkmark-done" size={20} color="white" />;
+      case "Canceled":
+        return <Ionicons name="close-circle" size={20} color="white" />;
+      case "Delivered":
+        return <Ionicons name="checkmark-circle" size={20} color="white" />;
+      default:
+        return <Ionicons name="time" size={20} color="white" />;
+    }
+  };
+
+  const getStatusLabelAndColor = () => {
+    switch (Number(numStatus)) {
+      case 5:
+        return { label: "Order New", bgColor: "bg-yellow-500" };
+      case 0:
+        return { label: "Delivering", bgColor: "bg-blue-500" };
+      case 6:
+        return { label: "Delivered", bgColor: "bg-green-800" };
+      case 10:
+        return { label: "Cancelled", bgColor: "bg-red-600" };
+      default:
+        return { label: "Unknown", bgColor: "bg-gray-600" };
+    }
+  };
+
+  const { label, bgColor } = getStatusLabelAndColor();
 
   const openImagePicker = (imageType: "pickup" | "delivery") => {
     setCurrentImageType(imageType);
@@ -262,14 +294,16 @@ export default function OrderDetail() {
               <Image source={{ uri: image }} className="w-32 h-32 rounded-lg" />
               <TouchableOpacity
                 className="absolute p-1 bg-red-500 rounded-full top-2 right-2"
-                onPress={() => removeImage(imageType)}>
+                onPress={() => removeImage(imageType)}
+              >
                 <Ionicons name="close" size={16} color="white" />
               </TouchableOpacity>
             </View>
           ) : (
             <TouchableOpacity
               className="items-center justify-center w-32 h-32 border border-gray-300 rounded-lg"
-              onPress={() => openImagePicker(imageType)}>
+              onPress={() => openImagePicker(imageType)}
+            >
               <Ionicons name="camera" size={24} color="#666" />
               <Text className="mt-2 text-sm text-gray-500">Thêm ảnh</Text>
             </TouchableOpacity>
@@ -338,55 +372,145 @@ export default function OrderDetail() {
       <ScrollView className="flex-1">
         <View className="p-4 m-2 bg-white rounded-lg shadow-md">
           <View className="flex-row items-center mb-4">
-            <Ionicons name="document-text-outline" size={24} color="#FF6600" />
-            <Text className="ml-2 text-lg font-bold text-orange-500">
-              Đơn mới
+            <Ionicons
+              name="document-text-outline"
+              size={24}
+              color={`#${
+                numStatus === "5"
+                  ? "FFCC00"
+                  : numStatus === "0"
+                  ? "0000FF"
+                  : numStatus === "6"
+                  ? "008000"
+                  : numStatus === "7"
+                  ? "FF0000"
+                  : "808080"
+              }`}
+            />
+            <Text
+              className={`ml-2 text-lg font-bold  ${
+                numStatus === "5"
+                  ? "text-[#FFCC00]"
+                  : numStatus === "0"
+                  ? "text-[#0000FF]"
+                  : numStatus === "6"
+                  ? "text-[#008000]"
+                  : numStatus === "7"
+                  ? "text-[#FF0000]"
+                  : "text-[#808080]"
+              }`}
+            >
+              {numStatus === "5"
+                ? "Order New"
+                : numStatus === "0"
+                ? "Delivering"
+                : numStatus === "6"
+                ? "Delivered"
+                : numStatus === "10"
+                ? "Cancelled"
+                : "Unknown"}
             </Text>
           </View>
+          <Image
+            source={{
+              uri: Array.isArray(imageOrder)
+                ? imageOrder[0]
+                : imageOrder ||
+                  "https://us.123rf.com/450wm/koblizeek/koblizeek2204/koblizeek220400315/185376169-no-image-vector-symbol-missing-available-icon-no-gallery-for-this-moment-placeholder.jpg",
+            }}
+            className="w-56 h-56 mx-auto mb-2 rounded-lg"
+          />
 
-          <View className="flex-row items-center justify-between mb-2">
-            <Text className="text-base text-gray-600">Mã đơn hàng:</Text>
-            <Text className="text-base font-bold text-gray-800">{id} </Text>
-          </View>
+          <Text className=" mt-2 border-gray-400 border-b-2 pb-2 text-lg uppercase mb-4 text-gray-600 font-semibold ">
+            Product Infomation
+          </Text>
 
           <View className="flex-row items-center justify-between mb-2">
             <Text className="text-base text-gray-600">Trạng thái:</Text>
-            <View className="px-3 py-1 bg-blue-100 rounded-full">
-              <Text className="font-bold text-blue-600">
-                {orderData?.status}
-              </Text>
+            <View className="  rounded-full">
+              <View
+                className={`flex-row items-center ${bgColor} px-2 py-1 rounded-md`}
+              >
+                {getStatusIcon()}
+                <Text className="ml-1 text-white font-semibold">{label}</Text>
+              </View>
             </View>
+          </View>
+          <View className="flex-row items-center justify-between mb-2">
+            <Text className="text-base text-gray-600">Order ID:</Text>
+            <Text className="text-base font-bold text-gray-800">#{id} </Text>
+          </View>
+          <View className="flex-row items-center justify-between mb-2">
+            <Text className="text-base text-gray-600">Name Product:</Text>
+            <Text className="text-base font-bold text-gray-800  w-[70%] text-right">
+              {orderData?.productName ||
+                orderData?.myBidDTO.lotDTO.title ||
+                "N/A"}
+            </Text>
           </View>
 
           <View className="flex-row items-center justify-between mb-2">
-            <Text className="text-base text-gray-600">Tổng tiền:</Text>
+            <Text className="text-base text-gray-600">Total Price:</Text>
             <Text className="text-base font-bold text-gray-800">
-              {orderData?.totalPrice}
+              {orderData?.totalPrice.toLocaleString("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              })}
+            </Text>
+          </View>
+          <Text className=" mt-2 border-gray-400 border-b-2 pb-2 text-lg uppercase mb-4 text-gray-600 font-semibold ">
+            Delivery Infomation
+          </Text>
+          <View className="flex-row items-center justify-between mb-2">
+            <Text className="text-base text-gray-600">Người nhận:</Text>
+            <Text className="text-base font-bold text-gray-800">
+              {orderData?.winnerName || "N/A"}
+            </Text>
+          </View>
+          <View className="flex-row items-center justify-between mb-2">
+            <Text className="text-base text-gray-600">PhoneNumber:</Text>
+            <Text className="text-base font-bold text-gray-800">
+              {orderData?.winnerPhone || "N/A"}
+            </Text>
+          </View>
+          <View className="flex-row items-center justify-between mb-2">
+            <Text className="text-base text-gray-600">Email:</Text>
+            <Text className="text-base font-bold text-gray-800">
+              {orderData?.winnerEmail || "N/A"}
+            </Text>
+          </View>
+          <Text className=" mt-2 border-gray-400 border-b-2 pb-2 text-lg uppercase mb-4 text-gray-600 font-semibold ">
+            Delivery Path
+          </Text>
+          <View className="flex-row items-center justify-between mb-2">
+            <Text className="text-base text-gray-600">Điểm đi:</Text>
+            <Text className="text-base font-bold text-gray-800">
+              Công ty JAS
+            </Text>
+          </View>
+          <View className="flex-row items-center justify-between mb-2">
+            <Text className="text-base text-gray-600">Điểm đến:</Text>
+            <Text className="text-base w-[70%] text-right font-bold text-gray-800">
+              {orderData?.addressToShip || "N/A"}
             </Text>
           </View>
 
-          <View className="mt-3">
-            <Text className="mb-1 text-base text-gray-600">Điểm đi:</Text>
-            <Text className="text-base text-gray-800">Công ty JAS</Text>
+          <Text className=" mt-2 border-gray-400 border-b-2 pb-2 text-lg uppercase mb-4 text-gray-600 font-semibold ">
+            Images confirm{" "}
+          </Text>
+          <View className="flex-row justify-between">
+            {renderImageUploadSection("pickup", pickupImage)}
+            {(isPickup || isDelivered) &&
+              renderImageUploadSection("delivery", deliveryImage)}
           </View>
-
-          <View className="mt-3">
-            <Text className="mb-1 text-base text-gray-600">Điểm đến:</Text>
-            <Text className="text-base text-gray-800">
-              {orderData?.addressToShipId}
-            </Text>
-          </View>
-
-          {renderImageUploadSection("pickup", pickupImage)}
-          {(isPickup || isDelivered) &&
-            renderImageUploadSection("delivery", deliveryImage)}
         </View>
       </ScrollView>
 
       {!isPickup && !isDelivered ? (
         <TouchableOpacity
           className="items-center justify-center p-4 bg-orange-500"
-          onPress={handleConfirmPickup}>
+          onPress={handleConfirmPickup}
+        >
           <Text className="text-lg font-bold text-white">Xác nhận</Text>
         </TouchableOpacity>
       ) : (
@@ -396,7 +520,8 @@ export default function OrderDetail() {
       {isPickup && !isDelivered ? (
         <TouchableOpacity
           className="items-center justify-center p-4 bg-orange-500"
-          onPress={handleConfirmDeliveried}>
+          onPress={handleConfirmDeliveried}
+        >
           <Text className="text-lg font-bold text-white">Hoàn Thành</Text>
         </TouchableOpacity>
       ) : (
@@ -407,21 +532,25 @@ export default function OrderDetail() {
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}>
+        onRequestClose={() => setModalVisible(false)}
+      >
         <TouchableOpacity
           className="justify-end flex-1 bg-transparent bg-opacity-50"
           activeOpacity={1}
-          onPress={() => setModalVisible(false)}>
+          onPress={() => setModalVisible(false)}
+        >
           <View className="p-5 bg-white rounded-t-3xl">
             <TouchableOpacity
               className="flex-row items-center p-4 border-b border-gray-200"
-              onPress={() => pickImage("camera")}>
+              onPress={() => pickImage("camera")}
+            >
               <Ionicons name="camera" size={24} color="#FF6600" />
               <Text className="ml-3 text-base text-gray-700">Chụp ảnh</Text>
             </TouchableOpacity>
             <TouchableOpacity
               className="flex-row items-center p-4 border-b border-gray-200"
-              onPress={() => pickImage("library")}>
+              onPress={() => pickImage("library")}
+            >
               <Ionicons name="images" size={24} color="#FF6600" />
               <Text className="ml-3 text-base text-gray-700">
                 Chọn từ thư viện
@@ -429,7 +558,8 @@ export default function OrderDetail() {
             </TouchableOpacity>
             <TouchableOpacity
               className="items-center justify-center p-4 mt-2"
-              onPress={() => setModalVisible(false)}>
+              onPress={() => setModalVisible(false)}
+            >
               <Text className="text-base font-bold text-orange-500">Hủy</Text>
             </TouchableOpacity>
           </View>
