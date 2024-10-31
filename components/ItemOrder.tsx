@@ -23,13 +23,15 @@ export default function ItemOrder({ order, handlePress, numStatus }: Props) {
   } = order;
 
   const getStatusIcon = () => {
-    switch (status) {
-      case "Delivering":
+    switch (numStatus) {
+      case 5:
         return <Ionicons name="checkmark-done" size={20} color="white" />;
-      case "Canceled":
+      case 0:
+        return <Ionicons name="time" size={20} color="white" />;
+      case 6:
+        return <Ionicons name="checkmark-done" size={20} color="white" />;
+      case 11:
         return <Ionicons name="close-circle" size={20} color="white" />;
-      case "Delivered":
-        return <Ionicons name="checkmark-circle" size={20} color="white" />;
       default:
         return <Ionicons name="time" size={20} color="white" />;
     }

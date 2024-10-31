@@ -93,17 +93,20 @@ const HomePage = () => {
     setRefreshing(false);
   }, [selectedStatus, fetchOrders]);
 
-  const handlePress = useCallback((orderId: string, imageOrder: string) => {
-    console.log("Item pressed");
-    router.push({
-      pathname: `/(app)/order/[id]`,
-      params: {
-        id: orderId,
-        imageOrder: imageOrder,
-        numStatus: selectedStatus,
-      },
-    });
-  }, []);
+  const handlePress = useCallback(
+    (orderId: string, imageOrder: string, statusOrder: number) => {
+      console.log("Item pressed");
+      router.push({
+        pathname: `/(app)/order/[id]`,
+        params: {
+          id: orderId,
+          imageOrder: imageOrder,
+          numStatus: statusOrder,
+        },
+      });
+    },
+    []
+  );
 
   // Handle manual refresh of all status counts
   const handleReloadAll = async () => {

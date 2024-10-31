@@ -17,7 +17,7 @@ interface OrderListProps {
   error: string | null;
   refreshing: boolean;
   onRefresh: () => void;
-  handlePress: (orderId: string, imageOrder: string) => void;
+  handlePress: (orderId: string, imageOrder: string, numStatus: number) => void;
   numStatus: number;
 }
 
@@ -65,7 +65,8 @@ const OrderList: React.FC<OrderListProps> = ({
             handlePress={() =>
               handlePress(
                 item.id.toString(),
-                item?.myBidDTO?.lotDTO?.imageLinkJewelry
+                item?.myBidDTO?.lotDTO?.imageLinkJewelry,
+                numStatus
               )
             }
           />

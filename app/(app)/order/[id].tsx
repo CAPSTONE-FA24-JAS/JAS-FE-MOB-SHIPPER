@@ -36,8 +36,6 @@ export default function OrderDetail() {
   const [pickupImage, setPickupImage] = useState<string>("");
   const [deliveryImage, setDeliveryImage] = useState<string>("");
 
-  console.log("orderDataID", JSON.stringify(orderData));
-
   // Check if order is picked up (status is "delivering")
   const isPickup =
     orderData?.statusInvoiceDTOs?.some(
@@ -122,12 +120,14 @@ export default function OrderDetail() {
 
   const getStatusIcon = () => {
     switch (numStatus) {
-      case "Delivering":
+      case "5":
         return <Ionicons name="checkmark-done" size={20} color="white" />;
-      case "Canceled":
+      case "0":
+        return <Ionicons name="time" size={20} color="white" />;
+      case "6":
+        return <Ionicons name="checkmark-done" size={20} color="white" />;
+      case "11":
         return <Ionicons name="close-circle" size={20} color="white" />;
-      case "Delivered":
-        return <Ionicons name="checkmark-circle" size={20} color="white" />;
       default:
         return <Ionicons name="time" size={20} color="white" />;
     }
@@ -238,7 +238,7 @@ export default function OrderDetail() {
     imageType: "pickup" | "delivery",
     image: string
   ) => {
-    const label = imageType === "pickup" ? "Nhận hàng:" : "Đã giao hàng:";
+    const label = imageType === "pickup" ? "Đã Lấy hàng:" : "Đã giao hàng:";
 
     // If picked up, show pickup image without edit controls
     if (imageType === "pickup" && isPickup) {
