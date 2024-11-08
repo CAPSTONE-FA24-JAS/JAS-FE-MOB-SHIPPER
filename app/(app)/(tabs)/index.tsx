@@ -1,6 +1,7 @@
 // app/(tabs)/index.tsx
 
 import {
+  getInvoiceDeliveringOfShipper,
   getInvoiceForShipper,
   getInvoicesReceivedByShipper,
 } from "@/api/invoiceApi";
@@ -43,12 +44,17 @@ const HomePage = () => {
       // Fetch counts for each status
       for (const status of STATUSES) {
         let data;
+        if (status === 5) {
+          data = await getInvoiceDeliveringOfShipper(10);
+        }
         if (status === 0) {
           data = await getInvoicesReceivedByShipper(10);
-        } else {
+        }
+        if (status === 6 || status === 10) {
           data = await getInvoiceForShipper(10, status);
         }
-        statusCounts[status] = data.dataResponse ? data.dataResponse.length : 0;
+        statusCounts[status] =
+          data && data.dataResponse ? data.dataResponse.length : 0;
       }
 
       setCounts(statusCounts); // Update state with counts
@@ -67,12 +73,16 @@ const HomePage = () => {
     setError(null);
     try {
       let data;
+      if (status === 5) {
+        data = await getInvoiceDeliveringOfShipper(10);
+      }
       if (status === 0) {
         data = await getInvoicesReceivedByShipper(10);
-      } else {
+      }
+      if (status === 6 || status === 10) {
         data = await getInvoiceForShipper(10, status);
       }
-      setOrders(data.dataResponse || []); // Ensure `dataResponse` is correctly handled
+      setOrders(data?.dataResponse || []); // Ensure `dataResponse` is correctly handled
     } catch (err) {
       setError("Failed to fetch orders. Please try again.");
       console.error("Error fetching orders:", err);
@@ -123,10 +133,9 @@ const HomePage = () => {
       <View className="flex-row justify-end mb-2">
         <TouchableOpacity
           onPress={handleReloadAll}
-          className="flex-row items-center justify-center bg-gray-300 w-1/4  px-4 py-2 rounded-md mx-4 "
-        >
+          className="flex-row items-center justify-center w-1/4 px-4 py-2 mx-4 bg-gray-300 rounded-md ">
           <MaterialIcons name="refresh" size={20} color="black" />
-          <Text className="ml-2 text-black font-semibold">Reload</Text>
+          <Text className="ml-2 font-semibold text-black">Reload</Text>
         </TouchableOpacity>
       </View>
       <StatusTabs

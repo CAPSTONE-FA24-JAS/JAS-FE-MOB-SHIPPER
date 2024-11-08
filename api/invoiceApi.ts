@@ -4,6 +4,7 @@ import { Invoice } from "@/types/invoice";
 import { dataResponse, Response } from "@/types/response";
 import axios from "axios";
 import apiClient from "./config";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:7251";
 interface formData {
@@ -199,6 +200,30 @@ export const updateInvoiceDeliveredStatus = async (
       );
     } else {
       console.error("Error updating invoice pickup status:", error);
+      throw error;
+    }
+  }
+};
+
+export const getInvoiceDeliveringOfShipper = async (shipperId: number) => {
+  try {
+    console.log("Getting invoice by status of shipper...", shipperId);
+    const response = await apiClient.get<Response<dataResponse<Invoice>>>(
+      `${API_URL}/api/Invoices/getDeliveringInvoicesByShipper?shipperId=${shipperId}`
+    );
+
+    const { data } = response.data;
+    console.log("data", data);
+
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error("Axios error:", error.toJSON());
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch invoices for shipper"
+      );
+    } else {
+      console.error("Error getting invoice for shipper:", error);
       throw error;
     }
   }

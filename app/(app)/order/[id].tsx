@@ -294,16 +294,14 @@ export default function OrderDetail() {
               <Image source={{ uri: image }} className="w-32 h-32 rounded-lg" />
               <TouchableOpacity
                 className="absolute p-1 bg-red-500 rounded-full top-2 right-2"
-                onPress={() => removeImage(imageType)}
-              >
+                onPress={() => removeImage(imageType)}>
                 <Ionicons name="close" size={16} color="white" />
               </TouchableOpacity>
             </View>
           ) : (
             <TouchableOpacity
               className="items-center justify-center w-32 h-32 border border-gray-300 rounded-lg"
-              onPress={() => openImagePicker(imageType)}
-            >
+              onPress={() => openImagePicker(imageType)}>
               <Ionicons name="camera" size={24} color="#666" />
               <Text className="mt-2 text-sm text-gray-500">Thêm ảnh</Text>
             </TouchableOpacity>
@@ -398,8 +396,7 @@ export default function OrderDetail() {
                   : numStatus === "7"
                   ? "text-[#FF0000]"
                   : "text-[#808080]"
-              }`}
-            >
+              }`}>
               {numStatus === "5"
                 ? "Order New"
                 : numStatus === "0"
@@ -421,18 +418,17 @@ export default function OrderDetail() {
             className="w-56 h-56 mx-auto mb-2 rounded-lg"
           />
 
-          <Text className=" mt-2 border-gray-400 border-b-2 pb-2 text-lg uppercase mb-4 text-gray-600 font-semibold ">
+          <Text className="pb-2 mt-2 mb-4 text-lg font-semibold text-gray-600 uppercase border-b-2 border-gray-400 ">
             Product Infomation
           </Text>
 
           <View className="flex-row items-center justify-between mb-2">
             <Text className="text-base text-gray-600">Trạng thái:</Text>
-            <View className="  rounded-full">
+            <View className="rounded-full ">
               <View
-                className={`flex-row items-center ${bgColor} px-2 py-1 rounded-md`}
-              >
+                className={`flex-row items-center ${bgColor} px-2 py-1 rounded-md`}>
                 {getStatusIcon()}
-                <Text className="ml-1 text-white font-semibold">{label}</Text>
+                <Text className="ml-1 font-semibold text-white">{label}</Text>
               </View>
             </View>
           </View>
@@ -458,7 +454,7 @@ export default function OrderDetail() {
               })}
             </Text>
           </View>
-          <Text className=" mt-2 border-gray-400 border-b-2 pb-2 text-lg uppercase mb-4 text-gray-600 font-semibold ">
+          <Text className="pb-2 mt-2 mb-4 text-lg font-semibold text-gray-600 uppercase border-b-2 border-gray-400 ">
             Delivery Infomation
           </Text>
           <View className="flex-row items-center justify-between mb-2">
@@ -479,7 +475,7 @@ export default function OrderDetail() {
               {orderData?.winnerEmail || "N/A"}
             </Text>
           </View>
-          <Text className=" mt-2 border-gray-400 border-b-2 pb-2 text-lg uppercase mb-4 text-gray-600 font-semibold ">
+          <Text className="pb-2 mt-2 mb-4 text-lg font-semibold text-gray-600 uppercase border-b-2 border-gray-400 ">
             Delivery Path
           </Text>
           <View className="flex-row items-center justify-between mb-2">
@@ -495,7 +491,7 @@ export default function OrderDetail() {
             </Text>
           </View>
 
-          <Text className=" mt-2 border-gray-400 border-b-2 pb-2 text-lg uppercase mb-4 text-gray-600 font-semibold ">
+          <Text className="pb-2 mt-2 mb-4 text-lg font-semibold text-gray-600 uppercase border-b-2 border-gray-400 ">
             Images confirm{" "}
           </Text>
           <View className="flex-row justify-between">
@@ -509,8 +505,7 @@ export default function OrderDetail() {
       {!isPickup && !isDelivered ? (
         <TouchableOpacity
           className="items-center justify-center p-4 bg-orange-500"
-          onPress={handleConfirmPickup}
-        >
+          onPress={handleConfirmPickup}>
           <Text className="text-lg font-bold text-white">Xác nhận</Text>
         </TouchableOpacity>
       ) : (
@@ -520,8 +515,7 @@ export default function OrderDetail() {
       {isPickup && !isDelivered ? (
         <TouchableOpacity
           className="items-center justify-center p-4 bg-orange-500"
-          onPress={handleConfirmDeliveried}
-        >
+          onPress={handleConfirmDeliveried}>
           <Text className="text-lg font-bold text-white">Hoàn Thành</Text>
         </TouchableOpacity>
       ) : (
@@ -532,25 +526,21 @@ export default function OrderDetail() {
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
+        onRequestClose={() => setModalVisible(false)}>
         <TouchableOpacity
           className="justify-end flex-1 bg-transparent bg-opacity-50"
           activeOpacity={1}
-          onPress={() => setModalVisible(false)}
-        >
+          onPress={() => setModalVisible(false)}>
           <View className="p-5 bg-white rounded-t-3xl">
             <TouchableOpacity
               className="flex-row items-center p-4 border-b border-gray-200"
-              onPress={() => pickImage("camera")}
-            >
+              onPress={() => pickImage("camera")}>
               <Ionicons name="camera" size={24} color="#FF6600" />
               <Text className="ml-3 text-base text-gray-700">Chụp ảnh</Text>
             </TouchableOpacity>
             <TouchableOpacity
               className="flex-row items-center p-4 border-b border-gray-200"
-              onPress={() => pickImage("library")}
-            >
+              onPress={() => pickImage("library")}>
               <Ionicons name="images" size={24} color="#FF6600" />
               <Text className="ml-3 text-base text-gray-700">
                 Chọn từ thư viện
@@ -558,8 +548,7 @@ export default function OrderDetail() {
             </TouchableOpacity>
             <TouchableOpacity
               className="items-center justify-center p-4 mt-2"
-              onPress={() => setModalVisible(false)}
-            >
+              onPress={() => setModalVisible(false)}>
               <Text className="text-base font-bold text-orange-500">Hủy</Text>
             </TouchableOpacity>
           </View>
