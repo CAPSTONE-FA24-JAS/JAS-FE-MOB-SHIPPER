@@ -18,11 +18,13 @@ const CustomButton = ({
     <TouchableOpacity
       style={[containerStyles]}
       activeOpacity={0.7}
-      className="items-center justify-center bg-white rounded-md min-h-14"
-      onPress={onPress}>
+      className="items-center justify-center mx-4 bg-white rounded-md min-h-14"
+      onPress={onPress}
+    >
       <Text
-        className="text-lg font-semibold text-[#007bff]"
-        style={[textStyles]}>
+        className="text-2xl py-2 font-semibold text-[#007bff]"
+        style={[textStyles]}
+      >
         {title}
       </Text>
     </TouchableOpacity>

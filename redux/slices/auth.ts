@@ -1,30 +1,40 @@
-import { AuthType } from "@/types/auth";
+import { UserAccount } from "@/types/login_type";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface AuthState {
   isAuthenticated: boolean;
-  user: AuthType | null;
+  token?: string;
+  userResponse?: UserAccount;
+  isPending?: boolean;
 }
 
 const initialState: AuthState = {
   isAuthenticated: false,
-  user: null,
+  isPending: false,
 };
 
-const authSlice = createSlice({
+export const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    login: (state, action: PayloadAction<AuthType>) => {
+    login: (
+      state,
+      action: PayloadAction<{ token: string; userResponse: UserAccount }>
+    ) => {
+      console.log("Login action dispatched with payload:", action.payload);
       state.isAuthenticated = true;
-      state.user = action.payload;
+      state.token = action.payload.token;
+      state.userResponse = action.payload.userResponse;
     },
     logout: (state) => {
+      // Reset the entire state upon logout
       state.isAuthenticated = false;
-      state.user = null;
+      state.token = undefined;
+      state.userResponse = undefined;
     },
   },
 });
 
 export const { login, logout } = authSlice.actions;
+
 export default authSlice.reducer;
