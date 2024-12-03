@@ -20,7 +20,7 @@ const STATUSES = [5, 0, 6, 10]; // Moved outside to prevent re-creation
 
 const HomePage = () => {
   const shiperId = useSelector(
-    (state: RootState) => state.auth?.userResponse?.customerDTO?.id
+    (state: RootState) => state.auth?.userResponse?.staffDTO?.id
   );
   const [selectedStatus, setSelectedStatus] = useState(5); // Default to "Order New"
   const [orders, setOrders] = useState<Invoice[]>([]);
@@ -35,7 +35,6 @@ const HomePage = () => {
     setSelectedStatus(status);
     fetchOrders(status); // Call fetchOrders when the status changes
   };
-
   const handlePressBell = () => {
     console.log("Bell icon pressed");
     // Navigate to notifications screen if implemented
@@ -142,8 +141,7 @@ const HomePage = () => {
       <View className="flex-row justify-end mb-2">
         <TouchableOpacity
           onPress={handleReloadAll}
-          className="flex-row items-center justify-center w-1/4 px-4 py-2 mx-4 bg-gray-300 rounded-md "
-        >
+          className="flex-row items-center justify-center w-1/4 px-4 py-2 mx-4 bg-gray-300 rounded-md ">
           <MaterialIcons name="refresh" size={20} color="black" />
           <Text className="ml-2 font-semibold text-black">Reload</Text>
         </TouchableOpacity>

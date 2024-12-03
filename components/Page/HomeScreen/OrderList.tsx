@@ -1,5 +1,3 @@
-// components/Page/HomeScreen/OrderList.tsx
-
 import React from "react";
 import {
   View,
@@ -32,7 +30,7 @@ const OrderList: React.FC<OrderListProps> = ({
 }) => {
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center">
+      <View className="items-center justify-center flex-1">
         <ActivityIndicator size="large" color="#6200ee" />
       </View>
     );
@@ -40,16 +38,8 @@ const OrderList: React.FC<OrderListProps> = ({
 
   if (error) {
     return (
-      <View className="flex-1 items-center justify-center">
+      <View className="items-center justify-center flex-1">
         <Text className="text-red-500">{error}</Text>
-      </View>
-    );
-  }
-
-  if (orders.length === 0) {
-    return (
-      <View className="flex-1 items-center justify-center">
-        <Text className="text-gray-500">No orders found.</Text>
       </View>
     );
   }
@@ -76,8 +66,16 @@ const OrderList: React.FC<OrderListProps> = ({
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         contentContainerStyle={{
+          flexGrow: 1,
           paddingVertical: 10,
+          ...(orders.length === 0 && {
+            justifyContent: "center",
+            alignItems: "center",
+          }),
         }}
+        ListEmptyComponent={() => (
+          <Text className="text-gray-500">No orders found</Text>
+        )}
       />
     </View>
   );

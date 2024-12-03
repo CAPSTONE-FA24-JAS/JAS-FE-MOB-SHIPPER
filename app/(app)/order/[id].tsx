@@ -1,29 +1,30 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  Alert,
-  Modal,
-  PermissionsAndroid,
-  Platform,
-} from "react-native";
-import { useLocalSearchParams } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
-import { Camera } from "expo-camera";
-import { StatusBar } from "expo-status-bar";
 import {
   getInvoiceById,
   updateInvoiceDeliveredStatus,
   updateInvoicePickupStatus,
 } from "@/api/invoiceApi";
 import { Invoice } from "@/types/invoice";
+import { Ionicons } from "@expo/vector-icons";
+import { Camera } from "expo-camera";
+import * as ImagePicker from "expo-image-picker";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import React, { useEffect, useState } from "react";
+import {
+  Alert,
+  Image,
+  Modal,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { ActivityIndicator } from "react-native-paper";
 
 export default function OrderDetail() {
   const { id, imageOrder, numStatus } = useLocalSearchParams();
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [currentImageType, setCurrentImageType] = useState<
@@ -141,8 +142,6 @@ export default function OrderDetail() {
         return { label: "Delivering", bgColor: "bg-blue-500" };
       case 6:
         return { label: "Delivered", bgColor: "bg-green-800" };
-      case 10:
-        return { label: "Cancelled", bgColor: "bg-red-600" };
       default:
         return { label: "Unknown", bgColor: "bg-gray-600" };
     }
@@ -311,7 +310,7 @@ export default function OrderDetail() {
     );
   };
 
-  const handleConfirmPickup = () => {
+  const handleConfirmPickup = async () => {
     Alert.alert(
       "Confirmation",
       "Are you sure you want to confirm this order?",
@@ -319,25 +318,37 @@ export default function OrderDetail() {
         {
           text: "Cancel",
           style: "cancel",
-          onPress: () => console.log("Confirmation cancelled"),
         },
         {
           text: "Confirm",
-          onPress: () => {
-            console.log("Order Pickup Confirmed");
-            updateInvoicePickupStatus(String(orderData?.id), pickupImage).then(
-              () => {
-                console.log("Order Pickup Status Updated");
-                Alert.alert("Success", "Order pickup confirmed successfully");
-              }
-            );
+          onPress: async () => {
+            try {
+              setIsLoading(true);
+              await updateInvoicePickupStatus(
+                String(orderData?.id),
+                pickupImage
+              );
+              Alert.alert("Success", "Order pickup confirmed successfully", [
+                {
+                  text: "OK",
+                  onPress: () => router.back(),
+                },
+              ]);
+            } catch (error) {
+              Alert.alert(
+                "Error",
+                "Failed to confirm pickup. Please try again."
+              );
+            } finally {
+              setIsLoading(false);
+            }
           },
         },
       ]
     );
   };
 
-  const handleConfirmDeliveried = () => {
+  const handleConfirmDelivered = async () => {
     Alert.alert(
       "Confirmation",
       "Are you sure you want to confirm this order?",
@@ -345,24 +356,43 @@ export default function OrderDetail() {
         {
           text: "Cancel",
           style: "cancel",
-          onPress: () => console.log("Confirmation cancelled"),
         },
         {
           text: "Confirm",
-          onPress: () => {
-            console.log("Order Pickup Confirmed");
-            updateInvoiceDeliveredStatus(
-              String(orderData?.id),
-              deliveryImage
-            ).then(() => {
-              console.log("Order Pickup Status Updated");
-              Alert.alert("Success", "Order delivery confirmed successfully");
-            });
+          onPress: async () => {
+            try {
+              setIsLoading(true);
+              await updateInvoiceDeliveredStatus(
+                String(orderData?.id),
+                deliveryImage
+              );
+              Alert.alert("Success", "Order delivery confirmed successfully", [
+                {
+                  text: "OK",
+                  onPress: () => router.back(),
+                },
+              ]);
+            } catch (error) {
+              Alert.alert(
+                "Error",
+                "Failed to confirm delivery. Please try again."
+              );
+            } finally {
+              setIsLoading(false);
+            }
           },
         },
       ]
     );
   };
+
+  const LoadingOverlay = () =>
+    isLoading ? (
+      <View className="absolute top-0 bottom-0 left-0 right-0 z-50 items-center justify-center w-full h-full bg-black/50">
+        <ActivityIndicator size="large" color="#FF6600" />
+        <Text className="mt-2 text-white">Processing...</Text>
+      </View>
+    ) : null;
 
   return (
     <View className="flex-1 bg-gray-100">
@@ -403,8 +433,6 @@ export default function OrderDetail() {
                 ? "Delivering"
                 : numStatus === "6"
                 ? "Delivered"
-                : numStatus === "10"
-                ? "Cancelled"
                 : "Unknown"}
             </Text>
           </View>
@@ -505,22 +533,24 @@ export default function OrderDetail() {
       {!isPickup && !isDelivered ? (
         <TouchableOpacity
           className="items-center justify-center p-4 bg-orange-500"
-          onPress={handleConfirmPickup}>
-          <Text className="text-lg font-bold text-white">Xác nhận</Text>
+          onPress={handleConfirmPickup}
+          disabled={isLoading}>
+          <Text className="text-lg font-bold text-white">
+            {isLoading ? "Processing..." : "Xác nhận"}
+          </Text>
         </TouchableOpacity>
-      ) : (
-        ""
-      )}
+      ) : null}
 
       {isPickup && !isDelivered ? (
         <TouchableOpacity
           className="items-center justify-center p-4 bg-orange-500"
-          onPress={handleConfirmDeliveried}>
-          <Text className="text-lg font-bold text-white">Hoàn Thành</Text>
+          onPress={handleConfirmDelivered}
+          disabled={isLoading}>
+          <Text className="text-lg font-bold text-white">
+            {isLoading ? "Processing..." : "Hoàn Thành"}
+          </Text>
         </TouchableOpacity>
-      ) : (
-        ""
-      )}
+      ) : null}
 
       <Modal
         animationType="slide"
@@ -554,6 +584,7 @@ export default function OrderDetail() {
           </View>
         </TouchableOpacity>
       </Modal>
+      <LoadingOverlay />
     </View>
   );
 }
