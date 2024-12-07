@@ -19,6 +19,8 @@ export default function ItemOrder({ order, handlePress, numStatus }: Props) {
         return <Ionicons name="time" size={18} color="white" />;
       case 6:
         return <Ionicons name="checkmark-done" size={18} color="white" />;
+      case 7:
+        return <Ionicons name="close-circle" size={18} color="white" />;
       case 11:
         return <Ionicons name="close-circle" size={18} color="white" />;
       default:
@@ -34,6 +36,8 @@ export default function ItemOrder({ order, handlePress, numStatus }: Props) {
         return { label: "Delivering", bgColor: "bg-blue-600" };
       case 6:
         return { label: "Delivered", bgColor: "bg-emerald-600" };
+      case 7:
+        return { label: "Reject", bgColor: "bg-red-500" };
       case 10:
         return { label: "Cancelled", bgColor: "bg-red-500" };
       default:

@@ -58,6 +58,10 @@ const HomePage = () => {
           if (status === 6 || status === 10) {
             data = await getInvoiceForShipper(shiperId, status);
           }
+          if (status === 7) {
+            data = await getInvoiceForShipper(shiperId, 7);
+          }
+
           statusCounts[status] =
             data && data.dataResponse ? data.dataResponse.length : 0;
         }
@@ -88,6 +92,9 @@ const HomePage = () => {
         }
         if (status === 6 || status === 10) {
           data = await getInvoiceForShipper(shiperId, status);
+        }
+        if (status === 7) {
+          data = await getInvoiceForShipper(shiperId, 7);
         }
         setOrders(data?.dataResponse || []); // Ensure `dataResponse` is correctly handled
       }

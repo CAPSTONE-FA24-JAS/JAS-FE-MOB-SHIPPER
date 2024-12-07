@@ -2,6 +2,7 @@ import {
   getInvoiceById,
   updateInvoiceDeliveredStatus,
   updateInvoicePickupStatus,
+  UpdateRejectedInvoiceByShipper,
 } from "@/api/invoiceApi";
 import { Invoice } from "@/types/invoice";
 import { Ionicons } from "@expo/vector-icons";
@@ -16,6 +17,7 @@ import {
   Modal,
   ScrollView,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -25,6 +27,20 @@ export default function OrderDetail() {
   const { id, imageOrder, numStatus } = useLocalSearchParams();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [cancelModalVisible, setCancelModalVisible] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+
+  const [selectedReason, setSelectedReason] = useState("");
+  const [customReason, setCustomReason] = useState("");
+
+  const cancelReasons = [
+    "Customer not available",
+    "Wrong delivery address",
+    "Package damaged during transit",
+    "Customer refused to accept",
+    "Weather conditions",
+    "Other",
+  ];
 
   const [modalVisible, setModalVisible] = useState(false);
   const [currentImageType, setCurrentImageType] = useState<
@@ -142,6 +158,8 @@ export default function OrderDetail() {
         return { label: "Delivering", bgColor: "bg-blue-500" };
       case 6:
         return { label: "Delivered", bgColor: "bg-green-800" };
+      case 7:
+        return { label: "Reject", bgColor: "bg-red-500" };
       default:
         return { label: "Unknown", bgColor: "bg-gray-600" };
     }
@@ -233,11 +251,53 @@ export default function OrderDetail() {
     }
   };
 
+  const handleCancelOrder = async () => {
+    const finalReason =
+      selectedReason === "Other" ? customReason : selectedReason;
+
+    if (!finalReason.trim()) {
+      Alert.alert("Error", "Please select or enter a reason for cancellation");
+      return;
+    }
+
+    Alert.alert("Confirmation", "Are you sure you want to cancel this order?", [
+      {
+        text: "No",
+        style: "cancel",
+      },
+      {
+        text: "Yes",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            setIsLoading(true);
+            if (orderData?.id) {
+              await UpdateRejectedInvoiceByShipper(orderData?.id, finalReason);
+              Alert.alert("Success", "Order cancelled successfully", [
+                {
+                  text: "OK",
+                  onPress: () => router.back(),
+                },
+              ]);
+            } else {
+              Alert.alert("Error", "Failed to cancel order. Please try again.");
+            }
+          } catch (error) {
+            Alert.alert("Error", "Failed to cancel order. Please try again.");
+          } finally {
+            setIsLoading(false);
+            setCancelModalVisible(false);
+          }
+        },
+      },
+    ]);
+  };
+
   const renderImageUploadSection = (
     imageType: "pickup" | "delivery",
     image: string
   ) => {
-    const label = imageType === "pickup" ? "Đã Lấy hàng:" : "Đã giao hàng:";
+    const label = imageType === "pickup" ? "Picked up:" : "Delivered:";
 
     // If picked up, show pickup image without edit controls
     if (imageType === "pickup" && isPickup) {
@@ -433,6 +493,8 @@ export default function OrderDetail() {
                 ? "Delivering"
                 : numStatus === "6"
                 ? "Delivered"
+                : numStatus === "7"
+                ? "Reject"
                 : "Unknown"}
             </Text>
           </View>
@@ -451,7 +513,7 @@ export default function OrderDetail() {
           </Text>
 
           <View className="flex-row items-center justify-between mb-2">
-            <Text className="text-base text-gray-600">Trạng thái:</Text>
+            <Text className="text-base text-gray-600">Status:</Text>
             <View className="rounded-full ">
               <View
                 className={`flex-row items-center ${bgColor} px-2 py-1 rounded-md`}>
@@ -486,13 +548,13 @@ export default function OrderDetail() {
             Delivery Infomation
           </Text>
           <View className="flex-row items-center justify-between mb-2">
-            <Text className="text-base text-gray-600">Người nhận:</Text>
+            <Text className="text-base text-gray-600">Customer:</Text>
             <Text className="text-base font-bold text-gray-800">
               {orderData?.winnerName || "N/A"}
             </Text>
           </View>
           <View className="flex-row items-center justify-between mb-2">
-            <Text className="text-base text-gray-600">PhoneNumber:</Text>
+            <Text className="text-base text-gray-600">Phone Number:</Text>
             <Text className="text-base font-bold text-gray-800">
               {orderData?.winnerPhone || "N/A"}
             </Text>
@@ -507,13 +569,13 @@ export default function OrderDetail() {
             Delivery Path
           </Text>
           <View className="flex-row items-center justify-between mb-2">
-            <Text className="text-base text-gray-600">Điểm đi:</Text>
+            <Text className="text-base text-gray-600">Pickup Point:</Text>
             <Text className="text-base font-bold text-gray-800">
               Công ty JAS
             </Text>
           </View>
           <View className="flex-row items-center justify-between mb-2">
-            <Text className="text-base text-gray-600">Điểm đến:</Text>
+            <Text className="text-base text-gray-600">Delivery Point:</Text>
             <Text className="text-base w-[70%] text-right font-bold text-gray-800">
               {orderData?.addressToShip || "N/A"}
             </Text>
@@ -527,6 +589,16 @@ export default function OrderDetail() {
             {(isPickup || isDelivered) &&
               renderImageUploadSection("delivery", deliveryImage)}
           </View>
+          {orderData?.status == "Rejected" && orderData?.note ? (
+            <>
+              <Text className="pb-2 mt-2 mb-4 text-lg font-semibold text-gray-600 uppercase border-b-2 border-gray-400 ">
+                Reason
+              </Text>
+              <Text className="text-base text-gray-600">
+                {orderData?.note || "N/A"}
+              </Text>
+            </>
+          ) : null}
         </View>
       </ScrollView>
 
@@ -536,21 +608,91 @@ export default function OrderDetail() {
           onPress={handleConfirmPickup}
           disabled={isLoading}>
           <Text className="text-lg font-bold text-white">
-            {isLoading ? "Processing..." : "Xác nhận"}
+            {isLoading ? "Processing..." : "Confirm Pickup"}
           </Text>
         </TouchableOpacity>
       ) : null}
 
-      {isPickup && !isDelivered ? (
-        <TouchableOpacity
-          className="items-center justify-center p-4 bg-orange-500"
-          onPress={handleConfirmDelivered}
-          disabled={isLoading}>
-          <Text className="text-lg font-bold text-white">
-            {isLoading ? "Processing..." : "Hoàn Thành"}
-          </Text>
-        </TouchableOpacity>
+      {isPickup && !isDelivered && orderData?.status !== "Rejected" ? (
+        <View className="flex-row">
+          <TouchableOpacity
+            className="items-center justify-center flex-1 p-4 bg-red-500"
+            onPress={() => setCancelModalVisible(true)}
+            disabled={isLoading}>
+            <Text className="text-lg font-bold text-white">Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            className="items-center justify-center flex-1 p-4 bg-orange-500"
+            onPress={handleConfirmDelivered}
+            disabled={isLoading}>
+            <Text className="text-lg font-bold text-white">
+              {isLoading ? "Processing..." : "Complete"}
+            </Text>
+          </TouchableOpacity>
+        </View>
       ) : null}
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={cancelModalVisible}
+        onRequestClose={() => setCancelModalVisible(false)}>
+        <TouchableOpacity
+          className="justify-center flex-1 bg-black/50"
+          activeOpacity={1}
+          onPress={() => setCancelModalVisible(false)}>
+          <View className="p-4 mx-4 bg-white rounded-lg">
+            <Text className="mb-4 text-lg font-bold">Cancel Order Reason</Text>
+
+            {cancelReasons.map((reason) => (
+              <TouchableOpacity
+                key={reason}
+                className={`p-3 mb-2 border rounded-lg ${
+                  selectedReason === reason
+                    ? "border-orange-500 bg-orange-50"
+                    : "border-gray-300"
+                }`}
+                onPress={() => setSelectedReason(reason)}>
+                <Text
+                  className={`text-base ${
+                    selectedReason === reason
+                      ? "text-orange-500"
+                      : "text-gray-700"
+                  }`}>
+                  {reason}
+                </Text>
+              </TouchableOpacity>
+            ))}
+
+            {selectedReason === "Other" && (
+              <TextInput
+                className="p-3 mt-2 mb-4 text-base border border-gray-300 rounded-lg"
+                multiline
+                placeholder="Enter your reason..."
+                value={customReason}
+                onChangeText={setCustomReason}
+              />
+            )}
+
+            <View className="flex-row justify-end mt-4 space-x-2">
+              <TouchableOpacity
+                className="px-4 py-2 bg-gray-200 rounded-lg"
+                onPress={() => {
+                  setCancelModalVisible(false);
+                  setSelectedReason("");
+                  setCustomReason("");
+                }}>
+                <Text className="font-medium text-gray-700">Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="px-4 py-2 bg-red-500 rounded-lg"
+                onPress={handleCancelOrder}>
+                <Text className="font-medium text-white">Confirm</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </Modal>
 
       <Modal
         animationType="slide"
@@ -566,14 +708,16 @@ export default function OrderDetail() {
               className="flex-row items-center p-4 border-b border-gray-200"
               onPress={() => pickImage("camera")}>
               <Ionicons name="camera" size={24} color="#FF6600" />
-              <Text className="ml-3 text-base text-gray-700">Chụp ảnh</Text>
+              <Text className="ml-3 text-base text-gray-700">
+                Take a picture
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               className="flex-row items-center p-4 border-b border-gray-200"
               onPress={() => pickImage("library")}>
               <Ionicons name="images" size={24} color="#FF6600" />
               <Text className="ml-3 text-base text-gray-700">
-                Chọn từ thư viện
+                Choose from gallery
               </Text>
             </TouchableOpacity>
             <TouchableOpacity

@@ -228,3 +228,27 @@ export const getInvoiceDeliveringOfShipper = async (shipperId: number) => {
     }
   }
 };
+
+export const UpdateRejectedInvoiceByShipper = async (
+  invoiceId: number,
+  reason: string
+) => {
+  try {
+    const response = await apiClient.put<Response<dataResponse<Invoice>>>(
+      `${API_URL}/api/Invoices/UpdateRejectedInvoiceByShipper?invoiceId=${invoiceId}&reason=${reason}`
+    );
+
+    const { data } = response.data;
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error("Axios error:", error.toJSON());
+      throw new Error(
+        error.response?.data?.message || "Failed to update rejected invoice"
+      );
+    } else {
+      console.error("Error updating rejected invoice:", error);
+      throw error;
+    }
+  }
+};
