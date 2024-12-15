@@ -8,8 +8,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: true,
-      }}
-    >
+      }}>
       <Tabs.Screen
         name="index"
         options={{

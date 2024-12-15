@@ -150,14 +150,13 @@ const Login = () => {
                 />
                 <TouchableOpacity
                   onPress={handlePasswordVisibility}
-                  className="absolute right-4 top-[40%] transform -translate-y-1/2"
-                >
+                  className="absolute right-4 top-[40%] transform -translate-y-1/2">
                   <Feather name={rightIcon} size={24} color="black" />
                 </TouchableOpacity>
               </View>
             </View>
 
-            <View className="flex-row items-center px-3 mx-7 my-3">
+            <View className="flex-row items-center px-3 my-3 mx-7">
               <Checkbox
                 status={rememberMe ? "checked" : "unchecked"}
                 onPress={() => setRememberMe(!rememberMe)}
@@ -171,8 +170,7 @@ const Login = () => {
             <View className="flex-row items-center justify-between mx-10 mt-6">
               <TouchableOpacity
                 className="w-[150px] bg-[#4765F9] rounded-md"
-                onPress={handleLogin}
-              >
+                onPress={handleLogin}>
                 <Text className="py-3 text-xl font-semibold text-center text-white uppercase px-9">
                   Sign in
                 </Text>

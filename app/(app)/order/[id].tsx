@@ -173,13 +173,13 @@ export default function OrderDetail() {
   };
 
   const removeImage = (imageType: "pickup" | "delivery") => {
-    Alert.alert("Xóa ảnh", "Bạn có chắc chắn muốn xóa ảnh này?", [
+    Alert.alert("Delete", "Are you sure to delete this picture?", [
       {
-        text: "Hủy",
+        text: "Cancel",
         style: "cancel",
       },
       {
-        text: "Xóa",
+        text: "Delete",
         style: "destructive",
         onPress: () => {
           if (imageType === "pickup") {
@@ -362,7 +362,7 @@ export default function OrderDetail() {
               className="items-center justify-center w-32 h-32 border border-gray-300 rounded-lg"
               onPress={() => openImagePicker(imageType)}>
               <Ionicons name="camera" size={24} color="#666" />
-              <Text className="mt-2 text-sm text-gray-500">Thêm ảnh</Text>
+              <Text className="mt-2 text-sm text-gray-500">Add Picture</Text>
             </TouchableOpacity>
           )}
         </View>
